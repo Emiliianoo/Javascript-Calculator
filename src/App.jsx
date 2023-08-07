@@ -1,11 +1,14 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
   const [text, setText] = useState("")
   const [expression, setExpression] = useState("");
+  const expressionWithoutSpaces = expression.trim();
+
+  const isOperator = (symbol) => {
+    return /[*/+-]/.test(symbol);
+  };
 
   const btnPress = (symbol) => {
 
@@ -15,16 +18,17 @@ function App() {
     } else if(symbol === "delete"){
       const updatedExpression = expression.trim();
       setExpression(updatedExpression.slice(0, -1));
-    } else if(text === '%'){
+    } else if(symbol === '%'){
       if(answer === "") return;
       setText((parseFloat(text) / 100).toString());
-    } else if(/[-+/*]/.test(symbol)) { // if it is an operator
-      setExpression(expression + " " + symbol + " ");
+    } else if(isOperator(symbol)) {
+      setExpression(expressionWithoutSpaces + " " + symbol + " ");
     } else if(symbol === "=") {
       getAnswer();
     } else if(symbol === ".") {
       const last = expression.split(/[-+/*]/g).pop();
 
+      if(!last) return;
       if(last?.includes(".")) return;
       setExpression(expression + symbol);
     } else if(symbol === "0") {
@@ -42,16 +46,33 @@ function App() {
   };
 
   const getAnswer = () => {
-    const expressionWithoutSpaces = expression.replace(/\s+/g, '');
-    try {
-      const answer = eval(expressionWithoutSpaces);
-      setText(answer.toString());
-      setExpression("");
-    } catch (error) {
-      // Handle any error that might occur during evaluation
-      setText('Error');
-      setExpression('');
+
+    if (isOperator(expressionWithoutSpaces.charAt(expressionWithoutSpaces.length - 1))) return;
+
+    const parts = expressionWithoutSpaces.split(" ");
+    const newParts = [];
+
+    for (let i = parts.length - 1; i >= 0; i--) {
+      if (["*", "/", "+"].includes(parts[i]) && isOperator(parts[i - 1])) {
+        newParts.unshift(parts[i]);
+        let j = 0;
+        let k = i - 1;
+        while (isOperator(parts[k])) {
+          k--;
+          j++;
+        }
+        i -= j;
+      } else {
+        newParts.unshift(parts[i]);
+      }
     }
+    const newExpression = newParts.join(" ");
+    if (isOperator(newExpression.charAt(0))) {
+      setText(eval(text + newExpression));
+    } else {
+      setText(eval(newExpression));
+    }
+    setExpression("");
   };
 
   return (
