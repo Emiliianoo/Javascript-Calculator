@@ -4,23 +4,24 @@ import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-  const [text, setText] = useState("0")
-  const [expression, setExpression] = useState("000000");
+  const [text, setText] = useState("")
+  const [expression, setExpression] = useState("");
 
   const btnPress = (symbol) => {
 
     if(symbol === "clear") {
-      setText("0");
-      setExpression("");
+      setText("");
+      setExpression("0");
     } else if(symbol === "delete"){
-      setExpression(expression.slice(0, -1));
+      const updatedExpression = expression.trim();
+      setExpression(updatedExpression.slice(0, -1));
     } else if(text === '%'){
       if(answer === "") return;
       setText((parseFloat(text) / 100).toString());
-    } else if(/[*/+-]/.test(symbol)) {
+    } else if(/[-+/*]/.test(symbol)) { // if it is an operator
       setExpression(expression + " " + symbol + " ");
     } else if(symbol === "=") {
-
+      getAnswer();
     } else if(symbol === ".") {
       const last = expression.split(/[-+/*]/g).pop();
 
@@ -38,7 +39,20 @@ function App() {
       }
     }
     
-  }
+  };
+
+  const getAnswer = () => {
+    const expressionWithoutSpaces = expression.replace(/\s+/g, '');
+    try {
+      const answer = eval(expressionWithoutSpaces);
+      setText(answer.toString());
+      setExpression("");
+    } catch (error) {
+      // Handle any error that might occur during evaluation
+      setText('Error');
+      setExpression('');
+    }
+  };
 
   return (
     <>
@@ -47,8 +61,10 @@ function App() {
         <br />
 
         <div id="calculator">
-          <div id="text">{text}</div>
-          <div id="display">{expression}</div>
+          <div id="display">
+            <div id="answer">{text}</div>
+            <div id="text">{expression}</div>
+          </div>
           <br />
 
           <button onClick={() => btnPress("clear")} className="btn" id="clear">AC</button>
