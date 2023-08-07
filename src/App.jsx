@@ -117,7 +117,7 @@ function App() {
           <button onClick={() => btnPress("=")} className="btn" id="equals">=</button>
         </div>
         <br />
-        <p>Made by Emiliano</p>
+        <a href='https://github.com/Emiliianoo'>Made by Emiliano</a>
       </div>
     </>
   )
