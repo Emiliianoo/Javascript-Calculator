@@ -71,28 +71,23 @@ function App() {
   };
 
   const getAnswer = () => {
-    if (
-      isOperator(
-        expressionWithoutSpaces.charAt(expressionWithoutSpaces.length - 1)
-      )
-    )
-      return;
+    if (isOperator(expressionWithoutSpaces.at(-1))) return;
 
     const parts = expressionWithoutSpaces.split(" ");
     const newParts = [];
 
-    for (let i = parts.length - 1; i >= 0; i--) {
+    let i = parts.length - 1;
+    while (i >= 0) {
       if (["*", "/", "+"].includes(parts[i]) && isOperator(parts[i - 1])) {
         newParts.unshift(parts[i]);
-        let j = 0;
         let k = i - 1;
         while (isOperator(parts[k])) {
           k--;
-          j++;
         }
-        i -= j;
+        i = k;
       } else {
         newParts.unshift(parts[i]);
+        i--;
       }
     }
     const newExpression = newParts.join(" ");
