@@ -85,8 +85,12 @@ function App() {
 
         <div id="calculator">
           <div id="display">
-            <div id="answer">{text}</div>
-            <div id="text">{expression}</div>
+            <div id="answer" data-testid="answer">
+              {text}
+            </div>
+            <div id="text" data-testid="expression">
+              {expression}
+            </div>
           </div>
           <br />
 
